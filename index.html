@@ -113,7 +113,8 @@
         <p class="lead" style="font-size:15px;margin-top:18px">Prefer to talk now? Call or text <span style="color:#fff;font-weight:700">(559) 961-0080</span>.</p>
       </div>
       <div>
-        <form onsubmit="event.preventDefault();document.getElementById('okmsg').style.display='block';this.reset();">
+        <form id="quoteForm">
+          <input type="text" name="company_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
           <div>
             <label>Name</label>
             <input type="text" name="name" placeholder="Your name" required />
@@ -132,11 +133,12 @@
           </div>
           <div class="consent">
             <input type="checkbox" id="c" required />
-            <label for="c">By checking this box, I agree to receive calls and text messages from Solar Power by Taylor at the number provided, including messages sent by autodialer, about my solar estimate. Consent is not a condition of purchase. Message frequency varies. Message &amp; data rates may apply. Reply STOP to opt out, HELP for help.</label>
+            <label for="c">By checking this box, I agree that Solar Power by Taylor (operated by Praos Services, LLC) may call and text me — including by autodialer and prerecorded or AI voice — at the number I provided, about my solar estimate. Consent is not a condition of purchase. Message frequency varies. Message &amp; data rates may apply. Reply STOP to opt out, HELP for help. Messaging is subject to our <a href="/privacy" style="color:#ffd36b">Privacy Policy</a> and <a href="/terms" style="color:#ffd36b">Terms</a>.</label>
           </div>
-          <button class="submit" type="submit">Send my request</button>
+          <button class="submit" type="submit" id="submitBtn">Send my request</button>
           <div class="ok" id="okmsg">Thanks — I'll be in touch shortly. — Taylor</div>
-          <p class="fineprint">We respect your privacy. Your information is used only to contact you about your estimate and is never sold or shared with third parties for their own marketing. See our Privacy Policy for details.</p>
+          <div class="ok" id="errmsg" style="display:none;background:#3a1212;border-color:#6b1f1f;color:#f0b6b6">Something went wrong sending that. Please call or text (559) 961-0080 and I'll take care of you.</div>
+          <p class="fineprint">We collect the details you enter here only to contact you about a solar estimate. We do not sell your information, and we never share mobile opt-in data with third parties for their own marketing. See our <a href="/privacy" style="color:#8ea0b3;text-decoration:underline">Privacy Policy</a>.</p>
         </form>
       </div>
     </div>
@@ -149,10 +151,11 @@
       <div class="brand" style="font-size:16px;margin-bottom:8px"><span class="mark" style="width:24px;height:24px;font-size:13px">☀️</span> Solar Power by Taylor</div>
       <div>Powered by Stellar Energy</div>
       <div>(559) 961-0080 · <a href="mailto:solarpowerbytaylor@gmail.com">solarpowerbytaylor@gmail.com</a></div>
-      <div style="margin-top:6px"><span class="placeholder">MAILING ADDRESS — TO ADD</span></div>
+      <div style="margin-top:6px">Praos Services, LLC · 6083 N Figarden Dr, Unit #821, Fresno, CA 93722</div>
       <div class="flinks">
         <a href="/privacy">Privacy Policy</a>
         <a href="/terms">Terms</a>
+        <a href="/privacy#your-rights">Do Not Sell or Share My Personal Information</a>
       </div>
     </div>
     <div style="max-width:34ch;font-size:12.5px">
@@ -162,5 +165,53 @@
   <div class="wrap" style="margin-top:22px;font-size:12px">© <span id="yr"></span> Solar Power by Taylor. All rights reserved.</div>
 </footer>
 <script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+<script>
+(function(){
+  var SUPA_URL = "https://dgqicfzrrpszzdnlfbbd.supabase.co";
+  var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRncWljZnpycnBzenpkbmxmYmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3NDQsImV4cCI6MjA5Mjc0NDc0NH0.7p6cZ4yG0QafMyNn5gddMODsKyVerUKHAJOLCURwwg8";
+  var CONSENT_VERSION = "2026-07-01";
+  var form = document.getElementById('quoteForm');
+  var ok = document.getElementById('okmsg');
+  var err = document.getElementById('errmsg');
+  var btn = document.getElementById('submitBtn');
+  function splitName(n){ n=(n||'').trim(); var i=n.indexOf(' '); return i<0 ? [n,''] : [n.slice(0,i), n.slice(i+1)]; }
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (form.company_website && form.company_website.value){ ok.style.display='block'; form.reset(); return; }
+    btn.disabled = true; btn.textContent = 'Sending…'; err.style.display = 'none';
+    var nm = splitName(form.name.value);
+    var labelEl = document.querySelector('label[for="c"]');
+    var consent = {
+      consent_text: labelEl ? labelEl.innerText.replace(/\s+/g,' ').trim() : '',
+      consent_version: CONSENT_VERSION,
+      consented_at: new Date().toISOString(),
+      user_agent: navigator.userAgent,
+      page_url: location.href
+    };
+    try { var ipRes = await fetch('https://api.ipify.org?format=json'); var ipJson = await ipRes.json(); consent.ip = ipJson.ip; } catch(_) {}
+    var payload = {
+      first_name: nm[0],
+      last_name: nm[1],
+      phone: form.phone.value,
+      email: form.email.value || null,
+      address: form.address.value || null,
+      form_source: 'solarpowerbytaylor.com',
+      additional_notes: JSON.stringify({ source_page: 'solarpowerbytaylor.com', consent: consent })
+    };
+    try {
+      var res = await fetch(SUPA_URL + '/rest/v1/intake_submissions', {
+        method: 'POST',
+        headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      ok.style.display = 'block'; form.reset();
+      btn.textContent = 'Sent ✓';
+    } catch(e2) {
+      err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Send my request';
+    }
+  });
+})();
+</script>
 </body>
 </html>
