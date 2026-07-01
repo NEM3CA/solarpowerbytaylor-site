@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>Get Your Free Solar Estimate — Solar Power by Taylor</title>
+<meta name="robots" content="noindex" />
+<style>
+  :root{ --navy:#0f2138; --sun:#ffb703; --sun2:#fd9e02; --ink:#12202f; --muted:#5b6b7a; --line:#dfe6ee; --bg:#f6f8fb; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;-webkit-text-size-adjust:100%}
+  .wrap{max-width:520px;margin:0 auto;padding:22px 18px 60px}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;justify-content:center;margin:6px 0 18px}
+  .brand .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:17px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 2px 14px rgba(15,33,56,.05)}
+  h1{font-size:24px;letter-spacing:-.4px;line-height:1.15}
+  .sub{color:var(--muted);font-size:15px;margin-top:8px;margin-bottom:20px}
+  label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+  input{width:100%;padding:15px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:17px;font-family:inherit;background:#fff;color:var(--ink)}
+  input:focus{outline:none;border-color:var(--sun2)}
+  .consent{display:flex;gap:11px;align-items:flex-start;margin-top:18px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:13px}
+  .consent input{width:22px;height:22px;flex:0 0 auto;margin-top:2px}
+  .consent label{margin:0;font-weight:400;font-size:12px;line-height:1.5;color:#48586a}
+  .consent a{color:#b06f00}
+  button{width:100%;margin-top:20px;background:linear-gradient(135deg,var(--sun),var(--sun2));color:var(--navy);border:none;font-weight:800;font-size:18px;padding:17px;border-radius:12px;cursor:pointer}
+  button:disabled{opacity:.6}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+  .ok{display:none;text-align:center;padding:20px 6px}
+  .ok .big{font-size:44px}
+  .ok h2{font-size:22px;margin:10px 0 6px}
+  .ok p{color:var(--muted);font-size:15px}
+  .err{display:none;background:#fde8e8;border:1px solid #f0b6b6;color:#8a1c1c;padding:12px;border-radius:10px;font-size:14px;margin-top:14px}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:18px;line-height:1.5}
+  .foot a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="mark">☀️</span> Solar Power by Taylor</div>
+  <div class="card">
+    <div id="formView">
+      <h1>Get your free solar estimate</h1>
+      <p class="sub">Enter your info below and Taylor will follow up with your numbers. No pressure, no obligation.</p>
+      <form id="doorForm">
+        <input class="hp" type="text" name="company_website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <label for="n">Name</label>
+        <input id="n" type="text" name="name" autocomplete="name" placeholder="Your name" required />
+        <label for="p">Mobile phone</label>
+        <input id="p" type="tel" name="phone" inputmode="tel" autocomplete="tel" placeholder="(555) 555-5555" required />
+        <label for="e">Email</label>
+        <input id="e" type="email" name="email" autocomplete="email" placeholder="you@email.com" />
+        <label for="a">Home address</label>
+        <input id="a" type="text" name="address" autocomplete="street-address" placeholder="Street, City" />
+        <div class="consent">
+          <input type="checkbox" id="c" required />
+          <label for="c">By checking this box, I agree that Solar Power by Taylor (operated by Praos Services, LLC) may call and text me at the number I provided about my solar estimate. Consent is not a condition of purchase. Message frequency varies. Message &amp; data rates may apply. Reply STOP to opt out, HELP for help. Messaging is subject to our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms</a>.</label>
+        </div>
+        <button type="submit" id="submitBtn">Get my free estimate</button>
+        <div class="err" id="errmsg">Couldn't send that — please check the phone number and try again.</div>
+      </form>
+    </div>
+    <div class="ok" id="okView">
+      <div class="big">☀️</div>
+      <h2>You're all set!</h2>
+      <p>Thanks — Taylor will be in touch shortly with your solar numbers.</p>
+    </div>
+  </div>
+  <div class="foot">
+    Solar Power by Taylor · Praos Services, LLC · 6083 N Figarden Dr, Unit #821, Fresno, CA 93722<br/>
+    <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a>
+  </div>
+</div>
+<script>
+(function(){
+  var SUPA_URL = "https://dgqicfzrrpszzdnlfbbd.supabase.co";
+  var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRncWljZnpycnBzenpkbmxmYmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3NDQsImV4cCI6MjA5Mjc0NDc0NH0.7p6cZ4yG0QafMyNn5gddMODsKyVerUKHAJOLCURwwg8";
+  var CONSENT_VERSION = "2026-07-01.2";
+  var form = document.getElementById('doorForm');
+  var btn = document.getElementById('submitBtn');
+  var err = document.getElementById('errmsg');
+  function splitName(n){ n=(n||'').trim(); var i=n.indexOf(' '); return i<0 ? [n,''] : [n.slice(0,i), n.slice(i+1)]; }
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (form.company_website && form.company_website.value){ document.getElementById('formView').style.display='none'; document.getElementById('okView').style.display='block'; return; }
+    btn.disabled = true; btn.textContent = 'Sending…'; err.style.display = 'none';
+    var nm = splitName(form.name.value);
+    var labelEl = document.querySelector('label[for="c"]');
+    var consent = {
+      consent_text: labelEl ? labelEl.innerText.replace(/\s+/g,' ').trim() : '',
+      consent_version: CONSENT_VERSION,
+      consented_at: new Date().toISOString(),
+      user_agent: navigator.userAgent,
+      page_url: location.href,
+      capture_method: 'in_person_door'
+    };
+    try { var ipRes = await fetch('https://api.ipify.org?format=json'); var ipJson = await ipRes.json(); consent.ip = ipJson.ip; } catch(_) {}
+    var payload = {
+      first_name: nm[0],
+      last_name: nm[1],
+      phone: form.phone.value,
+      email: form.email.value || null,
+      address: form.address.value || null,
+      form_source: 'door_optin',
+      additional_notes: JSON.stringify({ source_page: '/start', capture_method: 'in_person_door', consent: consent })
+    };
+    try {
+      var res = await fetch(SUPA_URL + '/rest/v1/intake_submissions', {
+        method: 'POST',
+        headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      document.getElementById('formView').style.display='none';
+      document.getElementById('okView').style.display='block';
+      window.scrollTo(0,0);
+    } catch(e2) {
+      err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Get my free estimate';
+    }
+  });
+})();
+</script>
+</body>
+</html>
