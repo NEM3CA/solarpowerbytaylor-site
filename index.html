@@ -175,6 +175,16 @@
   var err = document.getElementById('errmsg');
   var btn = document.getElementById('submitBtn');
   function splitName(n){ n=(n||'').trim(); var i=n.indexOf(' '); return i<0 ? [n,''] : [n.slice(0,i), n.slice(i+1)]; }
+  // E.164 for the consent register. US only, because that is all this business
+  // dials — and a number this cannot normalise is skipped rather than written
+  // badly. A junk row in a consent register is worse than no row: it is the
+  // record you produce when somebody disputes a call.
+  function toE164(raw){
+    var d = String(raw||'').replace(/\D/g,'');
+    if (d.length === 11 && d.charAt(0) === '1') d = d.slice(1);
+    return d.length === 10 ? '+1' + d : null;
+  }
+
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     if (form.company_website && form.company_website.value){ ok.style.display='block'; form.reset(); return; }
@@ -205,6 +215,30 @@
         body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      // THE CONSENT REGISTER, not just a JSON blob in a notes column. Consent was
+      // already being captured properly above and written into additional_notes
+      // only — a notes column is not the record you produce when somebody
+      // disputes a call. Measured 2026-09-02: tcpa_consent held 4 rows, all
+      // source='door', and not one web submission ever.
+      // Best-effort and AFTER the lead is saved: a lead must never be lost
+      // because a consent row failed.
+      var e164 = toE164(form.phone.value);
+      if (e164 && consent.consent_text) {
+        fetch(SUPA_URL + '/rest/v1/tcpa_consent', {
+          method: 'POST',
+          headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({
+            phone_e164: e164,
+            consenting_party: (nm[0] + ' ' + nm[1]).trim() || 'Unknown',
+            channel: 'web_form',
+            consent_text: consent.consent_text,
+            source: 'intake_form',
+            ip_address: consent.ip || null,
+            user_agent: navigator.userAgent
+          })
+        }).catch(function(){});
+      }
       ok.style.display = 'block'; form.reset();
       btn.textContent = 'Sent ✓';
     } catch(e2) {

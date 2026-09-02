@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Solar Power by Taylor</title>
+<meta name="robots" content="noindex" />
+<!--
+  campaign.html — one file serving every /c/<slug> campaign page.
+
+  Taylor 2026-09-02: campaign links should read solarpowerbytaylor.com, not
+  dialdeck.app.
+
+  HOW IT WORKS, AND WHY THERE IS NOTHING TO DEPLOY WHEN A PAGE CHANGES.
+  The words are NOT in this file. They live in the campaign_pages table, which
+  Taylor writes and clears inside DialDeck (Settings -> Landing pages). This
+  page reads that row at load time. So publishing a page is a switch in
+  DialDeck, not a commit here — and the two locks that govern it
+  (status='live' AND saul_cleared_at set) are enforced by row-level security on
+  the database, not by anything in this file. A draft is not merely hidden
+  here: it is not returned to an anonymous reader at all.
+
+  noindex, deliberately: a campaign page is for people handed the link. The
+  main site is what should rank.
+-->
+<style>
+  :root{
+    --navy:#0f2138; --navy2:#17314f; --sun:#ffb703; --sun2:#fd9e02;
+    --ink:#12202f; --muted:#5b6b7a; --line:#e7ecf1; --bg:#ffffff; --soft:#f6f8fb;
+    --radius:14px; --maxw:1080px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.55}
+  a{color:inherit}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.2px;font-size:18px;text-decoration:none}
+  .brand .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--sun),var(--sun2));display:flex;align-items:center;justify-content:center;font-size:17px}
+  .nav .cta{background:var(--navy);color:#fff;padding:10px 16px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px}
+  .hero{background:linear-gradient(180deg,var(--soft),#fff);padding:64px 0 50px;border-bottom:1px solid var(--line)}
+  .hero h1{font-size:clamp(30px,5vw,50px);line-height:1.08;letter-spacing:-1px;font-weight:850;max-width:18ch}
+  .hero p.sub{margin-top:18px;font-size:19px;color:var(--muted);max-width:52ch}
+  section{padding:52px 0}
+  .body{white-space:pre-wrap;font-size:17px;color:var(--muted);max-width:62ch}
+  .formwrap{background:var(--navy);color:#fff;border-radius:20px;padding:40px;display:grid;grid-template-columns:1.05fr 1fr;gap:36px;align-items:start}
+  .formwrap h2{color:#fff;font-size:clamp(22px,3vw,30px);letter-spacing:-.5px;font-weight:820}
+  .formwrap .lead{color:#c8d4e0;margin-top:10px;font-size:16px}
+  form{display:grid;gap:12px}
+  form label{font-size:13px;font-weight:600;color:#eaf0f6;display:block;margin-bottom:5px}
+  form input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid #33506f;background:#0d1b2d;color:#fff;font-size:15px;font-family:inherit}
+  form input::placeholder{color:#7f93a8}
+  .consent{display:flex;gap:10px;align-items:flex-start;margin-top:6px}
+  .consent input{width:auto;margin-top:4px}
+  .consent label{font-size:11.5px;line-height:1.5;color:#aebccb;font-weight:400}
+  .submit{background:linear-gradient(135deg,var(--sun),var(--sun2));color:var(--navy);border:none;font-weight:800;font-size:16px;padding:14px;border-radius:10px;cursor:pointer;margin-top:6px}
+  .submit:disabled{opacity:.7;cursor:default}
+  .fineprint{font-size:11px;color:#8ea0b3;margin-top:12px;line-height:1.5}
+  .ok{display:none;background:#123a26;border:1px solid #1f6b45;color:#b6f0cf;padding:14px;border-radius:10px;font-size:14px;margin-top:10px}
+  .err{display:none;background:#3a1212;border:1px solid #6b1f1f;color:#f0b6b6;padding:14px;border-radius:10px;font-size:14px;margin-top:10px}
+  footer{background:var(--soft);border-top:1px solid var(--line);padding:40px 0 28px;font-size:14px;color:var(--muted)}
+  footer a{color:var(--navy);text-decoration:none;font-weight:600}
+  .flinks{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
+  #loading,#missing{padding:90px 0;text-align:center;color:var(--muted)}
+  #missing h1{font-size:26px;color:var(--ink);margin-bottom:8px}
+  @media(max-width:820px){.formwrap{grid-template-columns:1fr;padding:28px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/"><span class="mark">☀️</span> Solar Power by Taylor</a>
+    <a class="cta" href="#quote">Get straight answers</a>
+  </div>
+</header>
+
+<div id="loading">Loading…</div>
+
+<!-- A page that is not live, not cleared, or does not exist looks the same from
+     out here. Saying "this page is in review" would tell a stranger it exists. -->
+<div id="missing" style="display:none">
+  <div class="wrap">
+    <h1>This link isn't live</h1>
+    <p>If somebody gave you this link, ask them for the current one — or just
+       <a href="/" style="color:var(--navy);font-weight:700">start here</a>.</p>
+  </div>
+</div>
+
+<main id="page" style="display:none">
+  <div class="hero">
+    <div class="wrap">
+      <h1 id="headline"></h1>
+      <p class="sub" id="subhead" style="display:none"></p>
+    </div>
+  </div>
+
+  <section id="bodysec" style="display:none">
+    <div class="wrap"><div class="body" id="body"></div></div>
+  </section>
+
+  <section id="quote">
+    <div class="wrap">
+      <div class="formwrap">
+        <div>
+          <h2>Tell me where to start</h2>
+          <p class="lead">Your name, your number and your address is enough. I'll look at your actual bill before I say anything about savings.</p>
+          <p class="lead" style="font-size:15px;margin-top:18px">Prefer to talk now? Call or text <span style="color:#fff;font-weight:700">(559) 553-4559</span>.</p>
+        </div>
+        <form id="quoteForm">
+          <!-- Same honeypot the main page uses. Bots fill it; people never see it. -->
+          <input type="text" name="company_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+          <div><label for="n">Name</label><input id="n" type="text" name="name" placeholder="Your name" required /></div>
+          <div><label for="p">Phone</label><input id="p" type="tel" name="phone" placeholder="(555) 555-5555" required /></div>
+          <div><label for="e">Email</label><input id="e" type="email" name="email" placeholder="you@email.com" /></div>
+          <div><label for="a">Home address</label><input id="a" type="text" name="address" placeholder="Street, City" /></div>
+          <div class="consent">
+            <input type="checkbox" id="c" required />
+            <label for="c">By checking this box, I agree that Solar Power by Taylor (operated by Praos Services, LLC) may call and text me at the number I provided, about my solar estimate. Consent is not a condition of purchase. Message frequency varies. Message &amp; data rates may apply. Reply STOP to opt out, HELP for help. Messaging is subject to our <a href="/privacy" style="color:#ffd36b">Privacy Policy</a> and <a href="/terms" style="color:#ffd36b">Terms</a>.</label>
+          </div>
+          <button class="submit" id="submitBtn" type="submit">Send my request</button>
+          <div class="ok" id="okmsg">Got it — I'll be in touch shortly.</div>
+          <div class="err" id="errmsg">Something went wrong. Please call or text (559) 553-4559.</div>
+          <p class="fineprint">We never sell your information.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Solar Power by Taylor — operated by Praos Services, LLC</div>
+    <div class="flinks">
+      <a href="/">Home</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a>
+      <a href="mailto:solarpowerbytaylor@gmail.com">solarpowerbytaylor@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var SUPA_URL = "https://dgqicfzrrpszzdnlfbbd.supabase.co";
+  var SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRncWljZnpycnBzenpkbmxmYmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxNjg3NDQsImV4cCI6MjA5Mjc0NDc0NH0.7p6cZ4yG0QafMyNn5gddMODsKyVerUKHAJOLCURwwg8";
+  var CONSENT_VERSION = "2026-07-01.2";
+  var H = { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY, 'Content-Type': 'application/json' };
+
+  // /c/labor-day-2026 -> "labor-day-2026". Same shape the database constrains.
+  var slug = (location.pathname.replace(/^\/c\/?/, '').replace(/\/+$/, '') || '');
+  var VALID = /^[a-z0-9][a-z0-9-]{1,60}$/;
+
+  var loading = document.getElementById('loading');
+  var missing = document.getElementById('missing');
+  var page = document.getElementById('page');
+
+  function showMissing(){ loading.style.display='none'; page.style.display='none'; missing.style.display='block'; }
+
+  if (!VALID.test(slug)) { showMissing(); return; }
+
+  fetch(SUPA_URL + '/rest/v1/campaign_pages?slug=eq.' + encodeURIComponent(slug) +
+        '&select=slug,name,headline,subhead,body,cta_label', { headers: H })
+    .then(function(r){ return r.ok ? r.json() : []; })
+    .then(function(rows){
+      var p = rows && rows[0];
+      // RLS returns nothing unless the page is live AND cleared, so an empty
+      // result is the normal answer for a draft. No second check needed here —
+      // but a row with no headline is still refused rather than rendered blank.
+      if (!p || !p.headline || !p.cta_label) { showMissing(); return; }
+      document.title = p.headline + ' — Solar Power by Taylor';
+      document.getElementById('headline').textContent = p.headline;
+      if (p.subhead) { var s = document.getElementById('subhead'); s.textContent = p.subhead; s.style.display = 'block'; }
+      if (p.body) { document.getElementById('body').textContent = p.body; document.getElementById('bodysec').style.display = 'block'; }
+      document.getElementById('submitBtn').textContent = p.cta_label;
+      loading.style.display = 'none';
+      page.style.display = 'block';
+    })
+    .catch(showMissing);
+
+  function splitName(n){ n=(n||'').trim(); var i=n.indexOf(' '); return i<0 ? [n,''] : [n.slice(0,i), n.slice(i+1)]; }
+
+  // E.164 for the consent register. US numbers only, because that is all this
+  // business dials — and a number this cannot normalise is skipped rather than
+  // written badly. A junk row in a consent register is worse than no row: it is
+  // the register you produce when somebody disputes a call.
+  function toE164(raw){
+    var d = String(raw||'').replace(/\D/g,'');
+    if (d.length === 11 && d.charAt(0) === '1') d = d.slice(1);
+    return d.length === 10 ? '+1' + d : null;
+  }
+
+  var form = document.getElementById('quoteForm');
+  var ok = document.getElementById('okmsg');
+  var err = document.getElementById('errmsg');
+  var btn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if (form.company_website && form.company_website.value){ ok.style.display='block'; form.reset(); return; }
+    btn.disabled = true; var label = btn.textContent; btn.textContent = 'Sending…'; err.style.display = 'none';
+
+    var nm = splitName(form.name.value);
+    var labelEl = document.querySelector('label[for="c"]');
+    var consentText = labelEl ? labelEl.innerText.replace(/\s+/g,' ').trim() : '';
+    var consent = {
+      consent_text: consentText, consent_version: CONSENT_VERSION,
+      consented_at: new Date().toISOString(), user_agent: navigator.userAgent,
+      page_url: location.href
+    };
+    try { var ipRes = await fetch('https://api.ipify.org?format=json'); var ipJson = await ipRes.json(); consent.ip = ipJson.ip; } catch(_) {}
+
+    var payload = {
+      first_name: nm[0], last_name: nm[1],
+      phone: form.phone.value,
+      email: form.email.value || null,
+      address: form.address.value || null,
+      // The campaign this lead came from. Same string DialDeck writes, so both
+      // doors land in one place and the reporting does not have to know which.
+      form_source: 'campaign:' + slug,
+      additional_notes: JSON.stringify({ source_page: location.href, consent: consent })
+    };
+
+    try {
+      var res = await fetch(SUPA_URL + '/rest/v1/intake_submissions', {
+        method: 'POST', headers: Object.assign({ 'Prefer': 'return=minimal' }, H),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      // THE CONSENT REGISTER, not just a JSON blob in a notes column. The
+      // anon policy on tcpa_consent accepts exactly this shape:
+      // source='intake_form', no lead_id, not revoked. Best-effort on purpose —
+      // the lead is already saved above and must never be lost because the
+      // consent row failed.
+      var e164 = toE164(form.phone.value);
+      if (e164 && consentText) {
+        fetch(SUPA_URL + '/rest/v1/tcpa_consent', {
+          method: 'POST', headers: Object.assign({ 'Prefer': 'return=minimal' }, H),
+          body: JSON.stringify({
+            phone_e164: e164,
+            consenting_party: (nm[0] + ' ' + nm[1]).trim() || 'Unknown',
+            channel: 'web_form',
+            consent_text: consentText,
+            source: 'campaign_page',
+            ip_address: consent.ip || null,
+            user_agent: navigator.userAgent
+          })
+        }).catch(function(){});
+      }
+
+      ok.style.display = 'block'; form.reset(); btn.textContent = 'Sent ✓';
+    } catch(e2) {
+      err.style.display = 'block'; btn.disabled = false; btn.textContent = label;
+    }
+  });
+})();
+</script>
+</body>
+</html>
