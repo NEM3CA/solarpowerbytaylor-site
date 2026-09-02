@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/c/:slug",
-      "destination": "/campaign.html"
+      "destination": "/campaign"
     }
   ]
 }
