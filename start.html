@@ -52,7 +52,7 @@
         <label for="a">Home address</label>
         <input id="a" type="text" name="address" autocomplete="street-address" placeholder="Street, City" />
         <div class="consent">
-          <input type="checkbox" id="c" required />
+          <input type="checkbox" id="c" />
           <label for="c">By checking this box, I agree that Solar Power by Taylor (operated by Praos Services, LLC) may call and text me at the number I provided about my solar estimate. Consent is not a condition of purchase. Message frequency varies. Message &amp; data rates may apply. Reply STOP to opt out, HELP for help. Messaging is subject to our <a href="/privacy">Privacy Policy</a> and <a href="/terms">Terms</a>.</label>
         </div>
         <button type="submit" id="submitBtn">Get my free estimate</button>
@@ -95,8 +95,12 @@
     btn.disabled = true; btn.textContent = 'Sending…'; err.style.display = 'none';
     var nm = splitName(form.name.value);
     var labelEl = document.querySelector('label[for="c"]');
+    // Agreeing to texts is optional (carrier rule): the form sends either way,
+    // and only a ticked box becomes a consent record.
+    var smsOptIn = !!(document.getElementById('c') && document.getElementById('c').checked);
     var consent = {
-      consent_text: labelEl ? labelEl.innerText.replace(/\s+/g,' ').trim() : '',
+      consent_text: (smsOptIn && labelEl) ? labelEl.innerText.replace(/\s+/g,' ').trim() : '',
+      sms_opt_in: smsOptIn,
       consent_version: CONSENT_VERSION,
       consented_at: new Date().toISOString(),
       user_agent: navigator.userAgent,
